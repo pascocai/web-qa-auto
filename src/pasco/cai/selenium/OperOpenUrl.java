@@ -2,22 +2,22 @@ package pasco.cai.selenium;
 
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
 
 public class OperOpenUrl extends Operation {
-	
-	private int browserType = 1;
-	
-	public OperOpenUrl(int type) {
-		browserType = type;
+
+	public OperOpenUrl(WebDriver driver, int type, int timeout) {
+		super(driver, type, timeout);
 	}
 
 	public void run(String url, String cookieKey,  String cookieValue) {
-		driver.get(url);
+		webDriver.get(url);
 		if(browserType==1){
-			if(cookieKey!=null)
-				driver.manage().addCookie(new Cookie(cookieKey, cookieValue));
-		} else if(browserType==3){System.out.println(cookieKey+" "+cookieValue);
-			((JavascriptExecutor) driver).executeScript("document.cookie='"+cookieKey+"="+cookieValue+"'");
+			if(!cookieKey.equals(""))
+				webDriver.manage().addCookie(new Cookie(cookieKey, cookieValue));
+		} else if(browserType==3){
+			if(!cookieKey.equals(""))
+				((JavascriptExecutor) webDriver).executeScript("document.cookie='"+cookieKey+"="+cookieValue+"'");
 		}
 	}
 }

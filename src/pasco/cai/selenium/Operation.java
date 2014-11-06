@@ -4,14 +4,13 @@ import org.openqa.selenium.WebDriver;
 
 public class Operation {
 	
-	public WebDriver driver = null;
+	WebDriver webDriver = null;
+	int browserType = 1;
+	int defaultTimeOut = 30;
 	
-	
-	
-	/*
-	public void Run(String elementId, int action) {
-		
+	public Operation(WebDriver driver, int type, int timeout) {
+		webDriver = driver;
+		browserType = type;
+		defaultTimeOut = timeout;
 	}
-	*/
-	
 }

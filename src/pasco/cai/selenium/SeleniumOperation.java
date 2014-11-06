@@ -7,7 +7,6 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
-import org.openqa.selenium.firefox.internal.ProfilesIni;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 
 public class SeleniumOperation {
@@ -29,20 +28,19 @@ public class SeleniumOperation {
 
 	public WebDriver setBrowser(int browserType) {	// cherome
 		if(browserType==1){
-			File file = new File("D:\\selenium_driver_win32\\chromedriver.exe");
+			File file = new File("D:\\selenium-webdriver\\chromedriver.exe");
 			System.setProperty("webdriver.chrome.driver", file.getAbsolutePath());
 			WebDriver driver = new ChromeDriver();
 			return driver;
 		} else if(browserType==2){	// firefox
 			File pathToBinary = new File("C:\\Documents and Settings\\pascocai\\Local Settings\\Application Data\\Mozilla Firefox\\firefox.exe");
 			FirefoxBinary ffBinary = new FirefoxBinary(pathToBinary);
-			//FirefoxProfile profile = new FirefoxProfile();
-			FirefoxProfile profile = new ProfilesIni().getProfile("default");
-			profile.setPreference("network.cookie.cookieBehavior", 2);
+			File profileDirectory = new File("D:\\selenium-webdriver\\ffwebdriver");
+			FirefoxProfile profile = new FirefoxProfile(profileDirectory);
 			WebDriver driver = new FirefoxDriver(ffBinary, profile);
 			return driver;
-		}  else if(browserType==3){	// ie
-			File file = new File("D:\\selenium_driver_win32\\IEDriverServer.exe");
+		} else if(browserType==3){	// ie
+			File file = new File("D:\\selenium-webdriver\\IEDriverServer.exe");
 			System.setProperty("webdriver.ie.driver", file.getAbsolutePath());
 			WebDriver driver = new InternetExplorerDriver();
 			return driver;
@@ -55,35 +53,44 @@ public class SeleniumOperation {
 	public void run(int fieldType, String fieldName, String fieldValue) {
 		switch(fieldType) {
 			case 0:
-				oper = new OperOpenUrl(browserType);
+				oper = new OperOpenUrl(webDriver, browserType, defaultTimeOut);
 				OperOpenUrl oou = (OperOpenUrl) oper;
-				oou.driver = webDriver;
-				String cookieKey = fieldValue.substring(0, fieldValue.lastIndexOf(":"));
-				String cookieValue = fieldValue.substring(fieldValue.lastIndexOf(":")+1);
+				String cookieKey = "";
+				String cookieValue = "";
+				if(!fieldValue.equals("")){
+					cookieKey = fieldValue.substring(0, fieldValue.lastIndexOf(":"));
+					cookieValue = fieldValue.substring(fieldValue.lastIndexOf(":")+1);
+				}
 				oou.run(fieldName, cookieKey, cookieValue);
 				break;
 			case 1:
-				oper = new OperClick(browserType, defaultTimeOut);
+				oper = new OperClick(webDriver, browserType, defaultTimeOut);
 				OperClick oc = (OperClick) oper;
-				oc.driver = webDriver;
 				oc.run(fieldName);
 				break;
 			case 2:
-				oper = new OperInputText(browserType, defaultTimeOut);
+				oper = new OperInputText(webDriver, browserType, defaultTimeOut);
 				OperInputText oit = (OperInputText) oper;
-				oit.driver = webDriver;
 				oit.run(fieldName, fieldValue);
 				break;
 			case 3:
-				oper = new OperCheckBox(browserType, defaultTimeOut);
+				oper = new OperCheckBox(webDriver, browserType, defaultTimeOut);
 				OperCheckBox ocb = (OperCheckBox) oper;
-				ocb.driver = webDriver;
 				ocb.run(fieldName, fieldValue);
 				break;
+			case 4:
+				oper = new OperUploadFile(webDriver, browserType, defaultTimeOut);
+				OperUploadFile ouf = (OperUploadFile) oper;
+				ouf.run(fieldName, fieldValue, defaultTimeOut);
+				break;
+			case 9:
+				oper = new OperHandleAlert(webDriver, browserType, defaultTimeOut);
+				OperHandleAlert oha = (OperHandleAlert) oper;
+				oha.run();
+				break;
 			case 10:
-				oper = new OperSubmitForm(browserType, defaultTimeOut);
+				oper = new OperSubmitForm(webDriver, browserType, defaultTimeOut);
 				OperSubmitForm osf = (OperSubmitForm) oper;
-				osf.driver = webDriver;
 				osf.run(fieldName);
 				break;
 		}
