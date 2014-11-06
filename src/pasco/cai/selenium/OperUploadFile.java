@@ -14,7 +14,7 @@ public class OperUploadFile extends Operation {
 		super(driver, type, timeout);
 	}
 
-	public void run(String locator, String file, int defaultTimeOut) {
+	public void run(String locator, String file) {
 		element = (new WebDriverWait(webDriver, defaultTimeOut)).until(ExpectedConditions.elementToBeClickable(By.xpath(locator)));
 		element.sendKeys(file);
 	}

@@ -12,9 +12,16 @@ import org.openqa.selenium.ie.InternetExplorerDriver;
 public class SeleniumOperation {
 	
 	private WebDriver webDriver = null;
-	private Operation oper = null;
 	private int browserType = 1;
 	private int defaultTimeOut = 30;
+	
+	OperOpenUrl oou = null;
+	OperClick oc = null;
+	OperInputText oit = null;
+	OperCheckBox ocb = null;
+	OperUploadFile ouf = null;
+	OperHandleAlert oha = null;
+	OperSubmitForm osf = null;
 	
 	public SeleniumOperation(int type, int timeout) {
 		webDriver = setBrowser(type);
@@ -26,35 +33,32 @@ public class SeleniumOperation {
 		webDriver.quit();
 	}
 
-	public WebDriver setBrowser(int browserType) {	// cherome
+	public WebDriver setBrowser(int browserType) {	// chrome
 		if(browserType==1){
 			File file = new File("D:\\selenium-webdriver\\chromedriver.exe");
 			System.setProperty("webdriver.chrome.driver", file.getAbsolutePath());
-			WebDriver driver = new ChromeDriver();
-			return driver;
+			return new ChromeDriver();
 		} else if(browserType==2){	// firefox
 			File pathToBinary = new File("C:\\Documents and Settings\\pascocai\\Local Settings\\Application Data\\Mozilla Firefox\\firefox.exe");
 			FirefoxBinary ffBinary = new FirefoxBinary(pathToBinary);
 			File profileDirectory = new File("D:\\selenium-webdriver\\ffwebdriver");
 			FirefoxProfile profile = new FirefoxProfile(profileDirectory);
-			WebDriver driver = new FirefoxDriver(ffBinary, profile);
-			return driver;
+			return  new FirefoxDriver(ffBinary, profile);
 		} else if(browserType==3){	// ie
 			File file = new File("D:\\selenium-webdriver\\IEDriverServer.exe");
 			System.setProperty("webdriver.ie.driver", file.getAbsolutePath());
 			WebDriver driver = new InternetExplorerDriver();
 			return driver;
 		} else {
-			WebDriver driver = new ChromeDriver();
-			return driver;
+			return new ChromeDriver();
 		}	
 	}
 	
 	public void run(int fieldType, String fieldName, String fieldValue) {
 		switch(fieldType) {
 			case 0:
-				oper = new OperOpenUrl(webDriver, browserType, defaultTimeOut);
-				OperOpenUrl oou = (OperOpenUrl) oper;
+				if(oou==null)
+					oou = new OperOpenUrl(webDriver, browserType, defaultTimeOut);
 				String cookieKey = "";
 				String cookieValue = "";
 				if(!fieldValue.equals("")){
@@ -64,33 +68,33 @@ public class SeleniumOperation {
 				oou.run(fieldName, cookieKey, cookieValue);
 				break;
 			case 1:
-				oper = new OperClick(webDriver, browserType, defaultTimeOut);
-				OperClick oc = (OperClick) oper;
+				if(oc==null)
+					oc = new OperClick(webDriver, browserType, defaultTimeOut);
 				oc.run(fieldName);
 				break;
 			case 2:
-				oper = new OperInputText(webDriver, browserType, defaultTimeOut);
-				OperInputText oit = (OperInputText) oper;
+				if(oit==null)
+					oit = new OperInputText(webDriver, browserType, defaultTimeOut);
 				oit.run(fieldName, fieldValue);
 				break;
 			case 3:
-				oper = new OperCheckBox(webDriver, browserType, defaultTimeOut);
-				OperCheckBox ocb = (OperCheckBox) oper;
+				if(ocb==null)
+					ocb = new OperCheckBox(webDriver, browserType, defaultTimeOut);
 				ocb.run(fieldName, fieldValue);
 				break;
 			case 4:
-				oper = new OperUploadFile(webDriver, browserType, defaultTimeOut);
-				OperUploadFile ouf = (OperUploadFile) oper;
-				ouf.run(fieldName, fieldValue, defaultTimeOut);
+				if(ouf==null)
+					ouf = new OperUploadFile(webDriver, browserType, defaultTimeOut);
+				ouf.run(fieldName, fieldValue);
 				break;
 			case 9:
-				oper = new OperHandleAlert(webDriver, browserType, defaultTimeOut);
-				OperHandleAlert oha = (OperHandleAlert) oper;
+				if(oha==null)
+					oha = new OperHandleAlert(webDriver, browserType, defaultTimeOut);
 				oha.run();
 				break;
 			case 10:
-				oper = new OperSubmitForm(webDriver, browserType, defaultTimeOut);
-				OperSubmitForm osf = (OperSubmitForm) oper;
+				if(osf==null)
+					osf = new OperSubmitForm(webDriver, browserType, defaultTimeOut);
 				osf.run(fieldName);
 				break;
 		}

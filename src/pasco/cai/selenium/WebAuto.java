@@ -97,7 +97,7 @@ public class WebAuto extends JFrame {
 		
 		JScrollPane scrollingResult = new JScrollPane(textarea);
 		
-		Font font = new Font("宋体", Font.PLAIN, 16);
+		Font font = new Font("摰�", Font.PLAIN, 16);
 
 		this.setTitle("Automatic Web QA");
 		this.setContentPane(getJContentPane());
