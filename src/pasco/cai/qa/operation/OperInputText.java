@@ -1,4 +1,4 @@
-package pasco.cai.selenium;
+package pasco.cai.qa.operation;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -6,16 +6,17 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-public class OperSubmitForm extends Operation {
-
-	public WebElement element = null;
+public class OperInputText extends Operation {
 	
-	public OperSubmitForm(WebDriver driver, int type, int timeout) {
+	private WebElement element = null;
+	
+	public OperInputText(WebDriver driver, int type, int timeout) {
 		super(driver, type, timeout);
 	}
 	
-	public void run(String locator) {
+	public void run(String locator, String value) {
 		element = (new WebDriverWait(webDriver, defaultTimeOut)).until(ExpectedConditions.presenceOfElementLocated(By.xpath(locator)));
-		element.submit();
+		element.clear();
+		element.sendKeys(value);
 	}
 }

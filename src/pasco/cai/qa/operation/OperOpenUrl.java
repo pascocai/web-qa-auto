@@ -1,4 +1,4 @@
-package pasco.cai.selenium;
+package pasco.cai.qa.operation;
 
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.JavascriptExecutor;

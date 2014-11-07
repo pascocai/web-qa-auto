@@ -1,4 +1,4 @@
-package pasco.cai.selenium;
+package pasco.cai.qa.operation;
 
 import java.io.File;
 
@@ -8,6 +8,10 @@ import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.ie.InternetExplorerDriver;
+
+import pasco.cai.qa.verification.VerifyAlert;
+import pasco.cai.qa.verification.VerifyElementExist;
+import pasco.cai.qa.verification.VerifyText;
 
 public class SeleniumOperation {
 	
@@ -22,6 +26,10 @@ public class SeleniumOperation {
 	OperUploadFile ouf = null;
 	OperHandleAlert oha = null;
 	OperSubmitForm osf = null;
+	
+	VerifyText vt = null;
+	VerifyElementExist vee = null;
+	VerifyAlert va = null;
 	
 	public SeleniumOperation(int type, int timeout) {
 		webDriver = setBrowser(type);
@@ -54,7 +62,9 @@ public class SeleniumOperation {
 		}	
 	}
 	
-	public void run(int fieldType, String fieldName, String fieldValue) {
+	public String run(int fieldType, String fieldName, String fieldValue) {
+		String returnStr = null;
+		String str = null;
 		switch(fieldType) {
 			case 0:
 				if(oou==null)
@@ -90,13 +100,62 @@ public class SeleniumOperation {
 			case 9:
 				if(oha==null)
 					oha = new OperHandleAlert(webDriver, browserType, defaultTimeOut);
-				oha.run();
+				oha.run(fieldValue);
 				break;
 			case 10:
 				if(osf==null)
 					osf = new OperSubmitForm(webDriver, browserType, defaultTimeOut);
 				osf.run(fieldName);
 				break;
+			case 21:
+				if(vt==null)
+					vt = new VerifyText(webDriver, browserType, defaultTimeOut);
+				str = vt.run(fieldName, fieldValue);
+				/*
+				 *  如果返回為null，表示沒有判斷條件，不作判斷
+				 *  如果返回為空字符串，表示判斷ok
+				 *  如果返回非空字符串，表示判斷fail，返回實際獲得的text
+				 */
+				if(str!=null){
+					if(str!="")
+						returnStr = "expected text:<"+fieldValue+"> but was:<"+str+">";
+					else
+						returnStr = "";
+				}
+				break;
+			case 22:
+				if(vee==null)
+					vee = new VerifyElementExist(webDriver, browserType, defaultTimeOut);
+				str = vee.run(fieldName);
+				/*
+				 *  如果返回為null，表示沒有判斷條件，不作判斷
+				 *  如果返回為空字符串，表示判斷ok
+				 *  如果返回非空字符串，表示判斷fail，返回實際獲得的text
+				 */
+				if(str!=null){
+					if(str!="")
+						returnStr = "no such element: <"+str+">";
+					else
+						returnStr = "";
+				}
+				break;
+			case 23:
+				if(va==null)
+					va = new VerifyAlert(webDriver, browserType, defaultTimeOut);
+				str = va.run(fieldValue);
+				/*
+				 *  如果返回為null，表示沒有判斷條件，不作判斷
+				 *  如果返回為空字符串，表示判斷ok
+				 *  如果返回非空字符串，表示判斷fail，返回實際獲得的text
+				 */
+				if(str!=null){
+					if(str!="")
+						returnStr = "expected alert:<"+fieldValue+"> but was:<"+str+">";
+					else
+						returnStr = "";
+				}
+				break;
 		}
+		return returnStr;
 	}
 }

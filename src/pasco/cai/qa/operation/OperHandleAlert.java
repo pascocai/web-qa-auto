@@ -1,4 +1,4 @@
-package pasco.cai.selenium;
+package pasco.cai.qa.operation;
 
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.WebDriver;
@@ -11,10 +11,14 @@ public class OperHandleAlert extends Operation {
 		super(driver, type, timeout);
 	}
 
-	public void run() {
+	public void run(String action) {
 		WebDriverWait wait = new WebDriverWait(webDriver, defaultTimeOut);
         wait.until(ExpectedConditions.alertIsPresent());
         Alert alert = webDriver.switchTo().alert();
-        alert.accept();
+        if(Integer.parseInt(action)==1) {	// confirm
+        	alert.accept();
+		} else { // cancel
+			alert.dismiss();
+		}
 	}
 }

@@ -1,4 +1,4 @@
-package pasco.cai.selenium;
+package pasco.cai.qa.ui;
 
 
 import javax.swing.SwingUtilities;
@@ -29,6 +29,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import pasco.cai.java.util.ReadFile;
 import pasco.cai.java.util.ReadFileExcel;
+import pasco.cai.qa.operation.SeleniumOperation;
 
 import java.awt.Rectangle;
 import java.io.File;
@@ -37,10 +38,10 @@ public class WebAuto extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	
-	private int browserType = 1;
+	private int defaultBrowser = 1;
 	private int defaultTimeOut = 30;
-	private int firstColumn = 2;
-	private int firstRow = 2;
+	private int defaultFirstColumn = 2;
+	private int defaultFirstRow = 2;
 	
 	SeleniumOperation seOper = null;
 
@@ -55,8 +56,6 @@ public class WebAuto extends JFrame {
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				
-				
 				WebAuto thisClass = new WebAuto();
 				thisClass.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 				thisClass.setVisible(true);
@@ -97,7 +96,7 @@ public class WebAuto extends JFrame {
 		
 		JScrollPane scrollingResult = new JScrollPane(textarea);
 		
-		Font font = new Font("摰�", Font.PLAIN, 16);
+		Font font = new Font("宋体", Font.PLAIN, 16);
 
 		this.setTitle("Automatic Web QA");
 		this.setContentPane(getJContentPane());
@@ -178,10 +177,10 @@ public class WebAuto extends JFrame {
 					return;
 				}
 				if(!tf3.getText().equals("")) {
-					firstColumn = Integer.parseInt(tf3.getText().trim());
+					defaultFirstColumn = Integer.parseInt(tf3.getText().trim());
 				}
 				if(!tf4.getText().equals("")) {
-					firstRow = Integer.parseInt(tf4.getText().trim());
+					defaultFirstRow = Integer.parseInt(tf4.getText().trim());
 				}
 				
 				ReadFile readFile = null;
@@ -221,7 +220,7 @@ public class WebAuto extends JFrame {
 		browserType1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				if(((JRadioButton) event.getSource()).getText().equals("Chrome"))
-					browserType = 1;
+					defaultBrowser = 1;
 			}
 		});
 		browserTypeGroup.add(browserType1);
@@ -230,7 +229,7 @@ public class WebAuto extends JFrame {
 		browserType2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				if(((JRadioButton) event.getSource()).getText().equals("Firefox"))
-					browserType = 2;
+					defaultBrowser = 2;
 			}
 		});
 		browserTypeGroup.add(browserType2);
@@ -239,7 +238,7 @@ public class WebAuto extends JFrame {
 		browserType3.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				if(((JRadioButton) event.getSource()).getText().equals("IE"))
-					browserType = 3;
+					defaultBrowser = 3;
 			}
 		});
 		browserTypeGroup.add(browserType3);
@@ -254,10 +253,10 @@ public class WebAuto extends JFrame {
 		tf2.setBounds(340, 100, 40, 30);
 		label3.setBounds(400, 100, 140, 30);
 		tf3.setBounds(530, 100, 40, 30);
-		tf3.setText(Integer.toString(firstColumn));
+		tf3.setText(Integer.toString(defaultFirstColumn));
 		label4.setBounds(570, 100, 140, 30);
 		tf4.setBounds(690, 100, 40, 30);
-		tf4.setText(Integer.toString(firstRow));
+		tf4.setText(Integer.toString(defaultFirstRow));
 				
 		textarea.setBounds(30, 150, 730, 360);
 		textarea.setEnabled(false);
@@ -302,7 +301,7 @@ public class WebAuto extends JFrame {
 		rf = new ReadFileExcel();
 		ReadFileExcel rfe = (ReadFileExcel) rf;
 		rfe.openExcel(importFile, 0);
-		seOper = new SeleniumOperation(browserType, defaultTimeOut);
+		seOper = new SeleniumOperation(defaultBrowser, defaultTimeOut);
 		int fieldTypes[] = new int[numberOfFields];
 		String fieldIds[] = new String[numberOfFields];
 		String fieldValues[] = new String[numberOfFields];
@@ -311,21 +310,37 @@ public class WebAuto extends JFrame {
 			textarea.insert("========== Runing case "+(caseIndex+1)+" ==========\n", textarea.getText().length());
 			jContentPane.paintImmediately(jContentPane.getBounds());
 			for(int fieldIndex=0;fieldIndex<numberOfFields;fieldIndex++) {
-				if(rfe.getCell(caseIndex+firstColumn-1, fieldIndex*3+1).equals(""))
+				if(rfe.getCell(caseIndex+defaultFirstColumn-1, fieldIndex*3+1).equals(""))
 					fieldTypes[fieldIndex] = -1;
 				else {
-					fieldTypes[fieldIndex] = Integer.parseInt(rfe.getCell(caseIndex+firstColumn-1, fieldIndex*3+firstRow-1));
-					fieldIds[fieldIndex] = rfe.getCell(caseIndex+firstColumn-1, fieldIndex*3+firstRow);
-					fieldValues[fieldIndex] = rfe.getCell(caseIndex+firstColumn-1, fieldIndex*3+firstRow+1);
+					fieldTypes[fieldIndex] = Integer.parseInt(rfe.getCell(caseIndex+defaultFirstColumn-1, fieldIndex*3+defaultFirstRow-1));
+					fieldIds[fieldIndex] = rfe.getCell(caseIndex+defaultFirstColumn-1, fieldIndex*3+defaultFirstRow);
+					fieldValues[fieldIndex] = rfe.getCell(caseIndex+defaultFirstColumn-1, fieldIndex*3+defaultFirstRow+1);
 				}
 			}
 			for(int fieldIndex=0;fieldIndex<numberOfFields;fieldIndex++) {
+				if(fieldTypes[fieldIndex]<0)
+					break;
 				textarea.insert("          ==== Runing field "+(fieldIndex+1)+" ====\n", textarea.getText().length());
 				jContentPane.paintImmediately(jContentPane.getBounds());
 				System.out.println(fieldTypes[fieldIndex] + " " + fieldIds[fieldIndex] + " " +fieldValues[fieldIndex]);
+				String str = null;
 				if(fieldTypes[fieldIndex]>=0)
-					seOper.run(fieldTypes[fieldIndex], fieldIds[fieldIndex], fieldValues[fieldIndex]);
-				textarea.insert("          ==== Field "+(fieldIndex+1)+" is finished ====\n", textarea.getText().length());
+					str = seOper.run(fieldTypes[fieldIndex], fieldIds[fieldIndex], fieldValues[fieldIndex]);
+				/*
+				 *  如果返回為null，表示沒有判斷條件，不作判斷
+				 *  如果返回為空字符串，表示判斷ok
+				 *  如果返回非空字符串，表示判斷fail，返回實際獲得的text
+				 */
+				if(str==null)
+					textarea.insert("          ==== Field "+(fieldIndex+1)+" is finished ====\n", textarea.getText().length());
+				else if(str=="")
+					textarea.insert("          ==== Field "+(fieldIndex+1)+" is ok ====\n", textarea.getText().length());
+				else if(str!="") {
+					textarea.insert("          "+str+"\n", textarea.getText().length());
+					textarea.insert("          ==== Field "+(fieldIndex+1)+" is fail ====\n", textarea.getText().length());
+				} 
+					
 				jContentPane.paintImmediately(jContentPane.getBounds());
 				
 			}
@@ -333,6 +348,7 @@ public class WebAuto extends JFrame {
 			jContentPane.paintImmediately(jContentPane.getBounds());
 		}
 		seOper.QuitDriver();
+		seOper = null;
 		rfe = null;
 	}
 }
