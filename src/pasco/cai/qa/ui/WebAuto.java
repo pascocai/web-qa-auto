@@ -27,6 +27,10 @@ import javax.swing.JTextField;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
+
 import pasco.cai.java.util.ReadFile;
 import pasco.cai.java.util.ReadFileExcel;
 import pasco.cai.qa.operation.SeleniumOperation;
@@ -52,7 +56,43 @@ public class WebAuto extends JFrame {
 	private Dimension screenSize = toolkit.getScreenSize();
 	File importFile = null;
 	JTextArea textarea = new JTextArea();
+	
+	private Element root = null;
+	private String chromeWebDriverFile = "drivers/win32/chromedriver.exe";
+	private String fireFoxFile = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
+	private String fireFoxFileWebDriverFile = "drivers/win32/ffwebdriver";
+	private String ieWebDriverFile = "drivers/win32/IEDriverServer.exe";
 
+	public boolean checkConfig() {
+		try {
+			File f = new File("config.xml");
+			SAXReader reader = new SAXReader();
+			Document doc = reader.read(f);
+			root = doc.getRootElement();
+			
+			String temp = root.element("VAR").element("chromeWebDriverFile").getTextTrim();
+			if(!temp.equals(""))
+				chromeWebDriverFile = temp;
+			
+			temp = root.element("VAR").element("fireFoxFile").getTextTrim();
+			if(!temp.equals(""))
+				fireFoxFile = temp;
+			
+			temp = root.element("VAR").element("fireFoxFileWebDriverFile").getTextTrim();
+			if(!temp.equals(""))
+				fireFoxFileWebDriverFile = temp;
+			
+			temp = root.element("VAR").element("ieWebDriverFile").getTextTrim();
+			if(!temp.equals(""))
+				ieWebDriverFile = temp;
+			
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
@@ -66,6 +106,17 @@ public class WebAuto extends JFrame {
 	public WebAuto() {
 		super();
 		initialize();
+
+		textarea.insert("Checking config file, please wait...\n", textarea.getText().length());
+		jContentPane.paintImmediately(jContentPane.getBounds());
+		if(checkConfig()){
+			textarea.insert("Config file ok.\n", textarea.getText().length());
+			jContentPane.paintImmediately(jContentPane.getBounds());
+		} else {
+			textarea.insert("Config file error.\n", textarea.getText().length());
+			jContentPane.paintImmediately(jContentPane.getBounds());
+			return;
+		}
 	}
 
 	private void initialize() {
@@ -158,6 +209,7 @@ public class WebAuto extends JFrame {
 		buttonRun.setToolTipText("Run");
 		buttonRun.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
+				
 				if(importFile==null||importFile.equals("")) {
 					textarea.insert("Please select a file.\n", textarea.getText().length());
 					jContentPane.paintImmediately(jContentPane.getBounds());
@@ -188,10 +240,16 @@ public class WebAuto extends JFrame {
 				String fileExtName = fileFullName.substring(fileFullName.lastIndexOf(".")+1);
 					
 				if(fileExtName.equals("xls")) {
+					seOper = new SeleniumOperation();
+					seOper.setConfig(chromeWebDriverFile, fireFoxFile, fireFoxFileWebDriverFile, ieWebDriverFile);
+					seOper.init(defaultBrowser, defaultTimeOut);
 					runWithExcel(readFile, Integer.parseInt(tf1.getText()), Integer.parseInt(tf2.getText()));
+					seOper.QuitDriver();
+					seOper = null;
 				} else {
 					textarea.insert("Import file type is invalid.\n", textarea.getText().length());
 					jContentPane.paintImmediately(jContentPane.getBounds());
+					return;
 				}
 			}
 		});
@@ -216,7 +274,7 @@ public class WebAuto extends JFrame {
 			}
 		});
 		
-		browserType1.setBounds(new Rectangle(30, 60, 80, 30));
+		browserType1.setBounds(new Rectangle(30, 60, 90, 30));
 		browserType1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				if(((JRadioButton) event.getSource()).getText().equals("Chrome"))
@@ -225,7 +283,7 @@ public class WebAuto extends JFrame {
 		});
 		browserTypeGroup.add(browserType1);
 		
-		browserType2.setBounds(new Rectangle(120, 60, 80, 30));
+		browserType2.setBounds(new Rectangle(130, 60, 90, 30));
 		browserType2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				if(((JRadioButton) event.getSource()).getText().equals("Firefox"))
@@ -234,7 +292,7 @@ public class WebAuto extends JFrame {
 		});
 		browserTypeGroup.add(browserType2);
 		
-		browserType3.setBounds(new Rectangle(210, 60, 60, 30));
+		browserType3.setBounds(new Rectangle(230, 60, 70, 30));
 		browserType3.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				if(((JRadioButton) event.getSource()).getText().equals("IE"))
@@ -243,8 +301,8 @@ public class WebAuto extends JFrame {
 		});
 		browserTypeGroup.add(browserType3);
 		
-		labelTimeOut.setBounds(260, 60, 140, 30);
-		textTimeOut.setBounds(375, 60, 40, 30);
+		labelTimeOut.setBounds(300, 60, 140, 30);
+		textTimeOut.setBounds(415, 60, 40, 30);
 		textTimeOut.setText(Integer.toString(defaultTimeOut));
 		
 		label1.setBounds(10, 100, 140, 30);
@@ -301,7 +359,7 @@ public class WebAuto extends JFrame {
 		rf = new ReadFileExcel();
 		ReadFileExcel rfe = (ReadFileExcel) rf;
 		rfe.openExcel(importFile, 0);
-		seOper = new SeleniumOperation(defaultBrowser, defaultTimeOut);
+		
 		int fieldTypes[] = new int[numberOfFields];
 		String fieldIds[] = new String[numberOfFields];
 		String fieldValues[] = new String[numberOfFields];
@@ -347,8 +405,6 @@ public class WebAuto extends JFrame {
 			textarea.insert("========== Case "+(caseIndex+1)+" is finished ==========\n", textarea.getText().length());
 			jContentPane.paintImmediately(jContentPane.getBounds());
 		}
-		seOper.QuitDriver();
-		seOper = null;
 		rfe = null;
 	}
 }

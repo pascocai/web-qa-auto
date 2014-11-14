@@ -31,34 +31,44 @@ public class SeleniumOperation {
 	VerifyElementExist vee = null;
 	VerifyAlert va = null;
 	
-	public SeleniumOperation(int type, int timeout) {
-		webDriver = setBrowser(type);
-		browserType = type;
-		defaultTimeOut = timeout;
+	private String chromeWebDriverFile = null;
+	private String fireFoxFile = null;
+	private String fireFoxFileWebDriverFile = null;
+	private String ieWebDriverFile = null;
+	
+	public SeleniumOperation() {
+		
+	}
+	
+	public void setConfig(String chromeWebDriverFile,  String fireFoxFile, String fireFoxFileWebDriverFile, String ieWebDriverFile) {
+		this.chromeWebDriverFile = chromeWebDriverFile;
+		this.fireFoxFile = fireFoxFile;
+		this.fireFoxFileWebDriverFile = fireFoxFileWebDriverFile;
+		this.ieWebDriverFile = ieWebDriverFile;
 	}
 
 	public void QuitDriver() {
 		webDriver.quit();
 	}
 
-	public WebDriver setBrowser(int browserType) {	// chrome
+	public void init(int browserType, int timeout) {	// chrome
+		defaultTimeOut = timeout;
 		if(browserType==1){
-			File file = new File("D:\\selenium-webdriver\\chromedriver.exe");
+			File file = new File(chromeWebDriverFile);
 			System.setProperty("webdriver.chrome.driver", file.getAbsolutePath());
-			return new ChromeDriver();
+			webDriver = new ChromeDriver();
 		} else if(browserType==2){	// firefox
-			File pathToBinary = new File("C:\\Documents and Settings\\pascocai\\Local Settings\\Application Data\\Mozilla Firefox\\firefox.exe");
+			File pathToBinary = new File(fireFoxFile);
 			FirefoxBinary ffBinary = new FirefoxBinary(pathToBinary);
-			File profileDirectory = new File("D:\\selenium-webdriver\\ffwebdriver");
+			File profileDirectory = new File(fireFoxFileWebDriverFile);
 			FirefoxProfile profile = new FirefoxProfile(profileDirectory);
-			return  new FirefoxDriver(ffBinary, profile);
+			webDriver = new FirefoxDriver(ffBinary, profile);
 		} else if(browserType==3){	// ie
-			File file = new File("D:\\selenium-webdriver\\IEDriverServer.exe");
+			File file = new File(ieWebDriverFile);
 			System.setProperty("webdriver.ie.driver", file.getAbsolutePath());
-			WebDriver driver = new InternetExplorerDriver();
-			return driver;
+			webDriver = new InternetExplorerDriver();
 		} else {
-			return new ChromeDriver();
+			webDriver = new ChromeDriver();
 		}	
 	}
 	

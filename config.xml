@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ROOT>
+	<VAR>
+		<chromeWebDriverFile>drivers/win32/chromedriver.exe</chromeWebDriverFile>
+		<fireFoxFile>C:\\Program Files\\Mozilla Firefox\\firefox.exe</fireFoxFile>
+		<fireFoxFileWebDriverFile>drivers/win32/ffwebdriver</fireFoxFileWebDriverFile>
+		<ieWebDriverFile>drivers/win32/IEDriverServer.exe</ieWebDriverFile>
+	</VAR>
+</ROOT>
