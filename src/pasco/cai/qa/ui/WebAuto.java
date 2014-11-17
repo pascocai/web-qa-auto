@@ -31,6 +31,7 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
+import pasco.cai.java.util.FileOperation;
 import pasco.cai.java.util.ReadFile;
 import pasco.cai.java.util.ReadFileExcel;
 import pasco.cai.qa.operation.SeleniumOperation;
@@ -62,6 +63,8 @@ public class WebAuto extends JFrame {
 	private String fireFoxFile = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
 	private String fireFoxFileWebDriverFile = "drivers/win32/ffwebdriver";
 	private String ieWebDriverFile = "drivers/win32/IEDriverServer.exe";
+	
+	FileOperation fo = new FileOperation();
 
 	public boolean checkConfig() {
 		try {
@@ -383,8 +386,15 @@ public class WebAuto extends JFrame {
 				jContentPane.paintImmediately(jContentPane.getBounds());
 				System.out.println(fieldTypes[fieldIndex] + " " + fieldIds[fieldIndex] + " " +fieldValues[fieldIndex]);
 				String str = null;
-				if(fieldTypes[fieldIndex]>=0)
-					str = seOper.run(fieldTypes[fieldIndex], fieldIds[fieldIndex], fieldValues[fieldIndex]);
+				if(fieldTypes[fieldIndex]>=0) {
+					try {
+						str = seOper.run(fieldTypes[fieldIndex], fieldIds[fieldIndex], fieldValues[fieldIndex]);
+					} catch (Exception e) {
+						e.printStackTrace();
+						fo.write(0, "log.html", e.toString());
+						str = "Got Exception Error";
+					}
+				}
 				/*
 				 *  如果返回為null，表示沒有判斷條件，不作判斷
 				 *  如果返回為空字符串，表示判斷ok
@@ -397,6 +407,7 @@ public class WebAuto extends JFrame {
 				else if(str!="") {
 					textarea.insert("          "+str+"\n", textarea.getText().length());
 					textarea.insert("          ==== Field "+(fieldIndex+1)+" is fail ====\n", textarea.getText().length());
+					fo.write(0, "log.html", str);
 				} 
 					
 				jContentPane.paintImmediately(jContentPane.getBounds());
